@@ -38,6 +38,8 @@
 
 #include <netinet/in.h>
 
+#include "GitVersion.h"
+
 #define DV3K_START_BYTE 0x61
 #define DV3K_TYPE_CONTROL 0x00
 #define DV3K_TYPE_AMBE 0x01
@@ -47,9 +49,8 @@
 
 static const unsigned char DV3K_CONTROL_PRODID[] = {0x61, 0x00U, 0x01U, 0x00U, 0x30};
 static const unsigned char DV3K_CONTROL_VERSTRING[] = {0x61, 0x00U, 0x01U, 0x00U, 0x31};
-static const unsigned char DV3K_CONTROL_RESET[] = {0x61, 0x00U, 0x01U, 0x00U, 0x33U};
 static const unsigned char DV3K_CONTROL_RESETSOFTCFG[] = {0x61, 0x00U, 0x07U, 0x00, 0x34U, 0x05U, 0x00U, 0x00U, 0x0FU, 0x00U, 0x00U};
-static const unsigned char ZERO_BYTE[] = {0x00};
+static const char ZERO_PACKET[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 #define dv3k_packet_size(a) (1 + sizeof((a).header) + ntohs((a).header.payload_length))
 
@@ -97,7 +98,7 @@ struct dv3k_packet {
 };
 #pragma pack(pop)
 
-#define	DV3000_VERSION		"Marrold_2017-11-18"
+#define	DV3000_VERSION		"2017-11-18"
 
 #define	DEFAULT_PORT		2460
 #define DEFAULT_TTY		"/dev/ttyUSB0"
@@ -281,15 +282,15 @@ static inline int checkResponse(struct dv3k_packet *responsePacket, unsigned cha
 int resetD3VK(int fd, int hwReset)
 {
 	struct dv3k_packet responsePacket;
-	int loops = 0;
+	int packets_recv = 0;
 
 	if(hwReset == 1) {
 		if(hardwareReset() == 0)
 			return 0;
 	} else {
 
-		for ( int i = 0; i < 300 ; i++ ) {
-			write(fd, ZERO_BYTE, 1);
+		for ( int i = 0; i < 35 ; i++ ) {
+			write(fd, ZERO_PACKET, 10);
 			usleep(1000);
 		}
 
@@ -302,9 +303,9 @@ int resetD3VK(int fd, int hwReset)
 		}
 	}
 
-	while( loops < 5 ) {
+	while( packets_recv < 5 ) {
 		
-		loops++;
+		packets_recv++;
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
 				dump("RESET Response:", &responsePacket);
@@ -331,15 +332,15 @@ int initDV3K(int fd, int hwReset)
 
 	while( retries < 50 ) {
 
+		retries++;
 		if(resetD3VK(fd, hwReset) == 1) {
-			fprintf(stderr, "AMBEserver: Reset Succesful\n");
+			fprintf(stderr, "AMBEserver: Reset Succesful after %d attempt(s)\n", retries);
 			reset_success = 1;
 			break;
 		}
 		if(debug)
 			fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
 		usleep(10000);
-		retries++;
 
 	}
 
@@ -628,7 +629,8 @@ int main(int argc, char **argv)
 	}
 
 	fprintf(stdout, "AMBEserver: Starting...\n");
-	fprintf(stdout, "AMBEserver: DVMega AMBE 3000 support\n");
+	fprintf(stdout, "AMBEserver: version %s git #%.7s\n", DV3000_VERSION, gitversion);
+	fprintf(stdout, "AMBEserver: RESETSOFTCFG Edition\n");
 
 	serialFd = openSerial(dv3000tty, baud);
 	if (serialFd < 0)
