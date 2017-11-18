@@ -292,16 +292,16 @@ int resetD3VK(int fd, int hwReset)
 		}
 	}
 
-	while( loops < 5 ) {
-
+	while( loops < 50 ) {
+		loops++;
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
 				dump("RESET Response:", &responsePacket);
 			if(checkResponse(&responsePacket, DV3K_CONTROL_READY) == 1) {
+				fprintf(stderr, "AMBEserver: Chip succesfully reset after %d attempts", loops );
 				return 1;
 			}
 		}
-		loops++;
 	}
 
 	return 0;
