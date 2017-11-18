@@ -19,7 +19,7 @@ make
 make install
 ```
 
-###Usage
+### Usage
 
 ```
 AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
