@@ -276,37 +276,61 @@ static inline int checkResponse(struct dv3k_packet *responsePacket, unsigned cha
 	return 1;
 }
 
+int resetD3VK(int fd, int hwReset)
+{
+	struct dv3k_packet responsePacket;
+	int loops = 0;
+
+	if(hwReset == 1) {
+		if(hardwareReset() == 0)
+			return 0;
+	} else {
+		tcflush(fd,TCIOFLUSH);
+		if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
+			fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
+			return 0;
+		}
+	}
+
+	while( loops < 5 ) {
+
+		if(readSerialPacket(fd, &responsePacket) == 1) {
+			if (debug)
+				dump("RESET Response:", &responsePacket);
+			if(checkResponse(&responsePacket, DV3K_CONTROL_READY) == 1) {
+				return 1;
+			}
+		}
+		loops++;
+	}
+
+	return 0;
+}
+
+
+
 int initDV3K(int fd, int hwReset)
 {
 	struct dv3k_packet responsePacket;
 	char prodId[17];
 	char version[49];
 
-	int loops = 0;
+	int retries = 0;
 	bool reset_success = 0;
 
-	if(hwReset == 1) {
-		if(hardwareReset() == 0)
-			return 0;
-	} else {
-			if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
-				fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
-				return 0;
-		}
-	}
 
-	while( loops < 10 ) {
+	while( retries < 50 ) {
 
-		if(readSerialPacket(fd, &responsePacket) == 1) {
-			if (debug)
-				dump("RESET Response:", &responsePacket);
-			if(checkResponse(&responsePacket, DV3K_CONTROL_READY) == 1) {
-				fprintf(stderr, "AMBEserver: Reset Succesful\n");
+		if(resetD3VK(fd, hwReset) == 1) {
+			fprintf(stderr, "AMBEserver: Reset Succesful\n");
 			reset_success = 1;
 			break;
-			}
 		}
-		loops++;
+		if(debug)
+			fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
+		usleep(10000);
+		retries++;
+
 	}
 
 	if ( reset_success == 0) {
@@ -386,14 +410,14 @@ int openSerial(char *ttyname, long baud)
 			return -1;
 	}
 	
-	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG);
+	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG | ICANON);
 	tty.c_iflag    &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IXOFF | IXANY);
 	tty.c_cflag    &= ~(CSIZE | CSTOPB | PARENB | CRTSCTS);
 	tty.c_cflag    |= CS8;
 	tty.c_oflag    &= ~(OPOST);
 	tty.c_cc[VMIN] = 0;
 	tty.c_cc[VTIME] = 10;
-	
+
 	if (tcsetattr(fd, TCSANOW, &tty) != 0) {
 		fprintf(stderr, "AMBEserver: tcsetattr: %s\n", strerror(errno));
 		return -1;
