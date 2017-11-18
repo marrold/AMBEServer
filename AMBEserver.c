@@ -292,7 +292,7 @@ int resetD3VK(int fd, int hwReset)
 		}
 	}
 
-	while( loops < 50 ) {
+	while( loops < 10 ) {
 		loops++;
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
@@ -324,7 +324,7 @@ int initDV3K(int fd, int hwReset)
 		if(resetD3VK(fd, hwReset) == 1) {
 			fprintf(stderr, "AMBEserver: Reset Succesful\n");
 			reset_success = 1;
-			break
+			break;
 		}
 		fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
 			break;
