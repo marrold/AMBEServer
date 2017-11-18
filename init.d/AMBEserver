@@ -11,7 +11,7 @@
 # Description: Provide daemon for AMBE Encoding and Decoding
 ### END INIT INFO
 
-N=/etc/init.d/AMBEserverGPIO
+N=/etc/init.d/AMBEserver
 
 set -e
 
