@@ -286,19 +286,19 @@ int resetD3VK(int fd, int hwReset)
 			return 0;
 	} else {
 		tcflush(fd,TCIOFLUSH);
+		usleep(10000);
 		if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
 			fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
 			return 0;
 		}
 	}
 
-	while( loops < 10 ) {
+	while( loops < 5 ) {
 		loops++;
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
 				dump("RESET Response:", &responsePacket);
 			if(checkResponse(&responsePacket, DV3K_CONTROL_READY) == 1) {
-				fprintf(stderr, "AMBEserver: Chip succesfully reset after %d attempts", loops );
 				return 1;
 			}
 		}
@@ -321,18 +321,16 @@ int initDV3K(int fd, int hwReset)
 
 	while( retries < 50 ) {
 
+		retries++;
+
 		if(resetD3VK(fd, hwReset) == 1) {
-			fprintf(stderr, "AMBEserver: Reset Succesful\n");
+			fprintf(stderr, "AMBEserver: Reset Succesful after %d attempt(s)\n", retries);
 			reset_success = 1;
-			break;
-		}
-		fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
 			break;
 		}
 		if(debug)
 			fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
-		usleep(10000);
-		retries++;
+		usleep(50000);
 
 	}
 
