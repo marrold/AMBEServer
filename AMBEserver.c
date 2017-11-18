@@ -276,14 +276,10 @@ static inline int checkResponse(struct dv3k_packet *responsePacket, unsigned cha
 	return 1;
 }
 
-int initDV3K(int fd, int hwReset)
+int resetD3VK(int fd, int hwReset)
 {
 	struct dv3k_packet responsePacket;
-	char prodId[17];
-	char version[49];
-
 	int loops = 0;
-	bool reset_success = 0;
 
 	if(hwReset == 1) {
 		if(hardwareReset() == 0)
@@ -295,18 +291,42 @@ int initDV3K(int fd, int hwReset)
 		}
 	}
 
-	while( loops < 10 ) {
+	while( loops < 5 ) {
 
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
 				dump("RESET Response:", &responsePacket);
 			if(checkResponse(&responsePacket, DV3K_CONTROL_READY) == 1) {
-				fprintf(stderr, "AMBEserver: Reset Succesful\n");
-			reset_success = 1;
-			break;
+				return 1;
 			}
 		}
 		loops++;
+	}
+
+}
+
+
+
+int initDV3K(int fd, int hwReset)
+{
+	struct dv3k_packet responsePacket;
+	char prodId[17];
+	char version[49];
+
+	int retries = 0;
+	bool reset_success = 0;
+
+
+	while( retries < 5 ) {
+
+		if(resetD3VK(fd, hwReset) == 1) {
+			fprintf(stderr, "AMBEserver: Reset Succesful\n");
+			reset_success = 1;
+			break
+		}
+		fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
+		retries++;
+
 	}
 
 	if ( reset_success == 0) {
