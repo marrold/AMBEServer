@@ -25,13 +25,13 @@ make install
 AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
 ```
 
--d Daemon Mode
--r Forces a hardware reset using a GPIO pin. Intended for a 'hat' on a Raspberry Pi
--s Baud rate (Defaults to 230400)
--p UDP port to listen on (Defaults to 2460)
--i tty of the AMBE Board (Defaults to dev/ttyUSB0)
--v Print version and exit
--x Debug mode
+-d Daemon Mode  
+-r Forces a hardware reset using a GPIO pin. Intended for a 'hat' on a Raspberry Pi  
+-s Baud rate (Defaults to 230400)  
+-p UDP port to listen on (Defaults to 2460)  
+-i tty of the AMBE Board (Defaults to dev/ttyUSB0)  
+-v Print version and exit  
+-x Debug mode  
 
 ### Current Issues
 
