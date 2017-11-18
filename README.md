@@ -19,6 +19,20 @@ make
 make install
 ```
 
+###Usage
+
+```
+AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
+```
+
+-d Daemon Mode
+-r Forces a hardware reset using a GPIO pin. Intended for a 'hat' on a Raspberry Pi
+-s Baud rate (Defaults to 230400)
+-p UDP port to listen on (Defaults to 2460)
+-i tty of the AMBE Board (Defaults to dev/ttyUSB0)
+-v Print version and exit
+-x Debug mode
+
 ### Current Issues
 
 There are currently a couple of issues that I hope to resolve-
@@ -29,9 +43,8 @@ There are currently a couple of issues that I hope to resolve-
 ### Acknowledgments
 
 Thanks to-
-G4KLX / NH6Z / K7VE / DL5DI - AMBEServer
-
-N80HU - Makefile inspiration
+G4KLX / NH6Z / K7VE / DL5DI - AMBEServer  
+N80HU - Makefile inspiration  
 
 ### License
 
