@@ -285,9 +285,10 @@ int resetD3VK(int fd, int hwReset)
 		if(hardwareReset() == 0)
 			return 0;
 	} else {
-			if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
-				fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
-				return 0;
+		tcflush(fd,TCIOFLUSH);
+		if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
+			fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
+			return 0;
 		}
 	}
 
@@ -303,6 +304,7 @@ int resetD3VK(int fd, int hwReset)
 		loops++;
 	}
 
+	return 0;
 }
 
 
@@ -317,7 +319,7 @@ int initDV3K(int fd, int hwReset)
 	bool reset_success = 0;
 
 
-	while( retries < 5 ) {
+	while( retries < 50 ) {
 
 		if(resetD3VK(fd, hwReset) == 1) {
 			fprintf(stderr, "AMBEserver: Reset Succesful\n");
@@ -325,6 +327,11 @@ int initDV3K(int fd, int hwReset)
 			break
 		}
 		fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
+			break;
+		}
+		if(debug)
+			fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
+		usleep(10000);
 		retries++;
 
 	}
@@ -406,14 +413,14 @@ int openSerial(char *ttyname, long baud)
 			return -1;
 	}
 	
-	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG);
+	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG | ICANON);
 	tty.c_iflag    &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IXOFF | IXANY);
 	tty.c_cflag    &= ~(CSIZE | CSTOPB | PARENB | CRTSCTS);
 	tty.c_cflag    |= CS8;
 	tty.c_oflag    &= ~(OPOST);
 	tty.c_cc[VMIN] = 0;
 	tty.c_cc[VTIME] = 10;
-	
+
 	if (tcsetattr(fd, TCSANOW, &tty) != 0) {
 		fprintf(stderr, "AMBEserver: tcsetattr: %s\n", strerror(errno));
 		return -1;
