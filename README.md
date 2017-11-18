@@ -43,7 +43,9 @@ There are currently a couple of issues that I hope to resolve-
 ### Acknowledgments
 
 Thanks to-
-G4KLX / NH6Z / K7VE / DL5DI - AMBEServer  
+
+G4KLX - AMBESever / GitVersion.h
+NH6Z / K7VE / DL5DI - AMBEServer  
 N80HU - Makefile inspiration  
 
 ### License
