@@ -285,13 +285,13 @@ int resetD3VK(int fd, int hwReset)
 		if(hardwareReset() == 0)
 			return 0;
 	} else {
-			if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
-				fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
-				return 0;
+		if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
+			fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
+			return 0;
 		}
 	}
 
-	while( loops < 5 ) {
+	while( loops < 10 ) {
 
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
@@ -303,6 +303,7 @@ int resetD3VK(int fd, int hwReset)
 		loops++;
 	}
 
+	return 0;
 }
 
 
@@ -317,14 +318,15 @@ int initDV3K(int fd, int hwReset)
 	bool reset_success = 0;
 
 
-	while( retries < 5 ) {
+	while( retries < 60 ) {
 
 		if(resetD3VK(fd, hwReset) == 1) {
 			fprintf(stderr, "AMBEserver: Reset Succesful\n");
 			reset_success = 1;
-			break
+			break;
 		}
 		fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
+		usleep(500000);
 		retries++;
 
 	}
