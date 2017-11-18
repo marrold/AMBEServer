@@ -48,6 +48,7 @@
 static const unsigned char DV3K_CONTROL_PRODID[] = {0x61, 0x00U, 0x01U, 0x00U, 0x30};
 static const unsigned char DV3K_CONTROL_VERSTRING[] = {0x61, 0x00U, 0x01U, 0x00U, 0x31};
 static const unsigned char DV3K_CONTROL_RESETSOFTCFG[] = {0x61, 0x00U, 0x07U, 0x00, 0x34U, 0x05U, 0x00U, 0x00U, 0x0FU, 0x00U, 0x00U};
+static const unsigned char ZERO_BYTE[] = {0x00};
 
 #define dv3k_packet_size(a) (1 + sizeof((a).header) + ntohs((a).header.payload_length))
 
@@ -285,15 +286,23 @@ int resetD3VK(int fd, int hwReset)
 		if(hardwareReset() == 0)
 			return 0;
 	} else {
+
+		for ( int i = 0; i < 300 ; i++ ) {
+			write(fd, ZERO_BYTE, 1);
+			usleep(1000);
+		}
+
 		tcflush(fd,TCIOFLUSH);
-		usleep(10000);
+		usleep(1000);
+
 		if(write(fd, DV3K_CONTROL_RESETSOFTCFG, 11)  == -1) {
-			fprintf(stderr, "AMBEserver: error writing reset packet: %s\n", strerror(errno));
+			fprintf(stderr, "AMBEserver: error writing RESETSOFTCFG packet: %s\n", strerror(errno));
 			return 0;
 		}
 	}
 
 	while( loops < 5 ) {
+		
 		loops++;
 		if(readSerialPacket(fd, &responsePacket) == 1) {
 			if (debug)
@@ -322,7 +331,6 @@ int initDV3K(int fd, int hwReset)
 	while( retries < 50 ) {
 
 		retries++;
-
 		if(resetD3VK(fd, hwReset) == 1) {
 			fprintf(stderr, "AMBEserver: Reset Succesful after %d attempt(s)\n", retries);
 			reset_success = 1;
@@ -330,7 +338,8 @@ int initDV3K(int fd, int hwReset)
 		}
 		if(debug)
 			fprintf(stderr, "AMBEserver: Reset failed, trying again.\n");
-		usleep(50000);
+		
+		usleep(10000);
 
 	}
 
@@ -338,6 +347,8 @@ int initDV3K(int fd, int hwReset)
 		fprintf(stderr, "AMBEserver: Reset failed, giving up.\n");
 		return 0;
 	}
+
+	
 
 	if(write(fd, DV3K_CONTROL_PRODID, 5) == -1) {		
 				fprintf(stderr, "AMBEserver: error writing product id packet: %s\n", strerror(errno));
@@ -411,9 +422,9 @@ int openSerial(char *ttyname, long baud)
 			return -1;
 	}
 	
-	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG | ICANON);
+	tty.c_lflag    &= ~(ECHO | ECHOE | ICANON | IEXTEN | ISIG );
 	tty.c_iflag    &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON | IXOFF | IXANY);
-	tty.c_cflag    &= ~(CSIZE | CSTOPB | PARENB | CRTSCTS);
+	tty.c_cflag    &= ~(CSIZE | CSTOPB | PARENB );
 	tty.c_cflag    |= CS8;
 	tty.c_oflag    &= ~(OPOST);
 	tty.c_cc[VMIN] = 0;
@@ -617,6 +628,7 @@ int main(int argc, char **argv)
 	}
 
 	fprintf(stdout, "AMBEserver: Starting...\n");
+	fprintf(stdout, "AMBEserver: DVMega AMBE 3000 support\n");
 
 	serialFd = openSerial(dv3000tty, baud);
 	if (serialFd < 0)
