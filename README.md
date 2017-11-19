@@ -38,7 +38,7 @@ AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
 There are currently a couple of issues that I hope to resolve-
 
 * If the AMBE chip reboots, AMBEServer will need to be restarted.
-* If the process interacting with AMBEServer sends a RESET packet, the AMBE chip will go into the incorrect mode and will stay there until AMBEServer is restarted. 
+* If the process interacting with AMBEServer sends a RESET packet, the AMBE chip will go into the incorrect mode and will stay there until AMBEServer is restarted - Its been confirmed Analog_Brdge *wont't* send a RESET under any circumstances
 
 ### Acknowledgments
 
