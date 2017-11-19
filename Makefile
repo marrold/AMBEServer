@@ -2,11 +2,11 @@ all:	AMBEserver
 
 GCC := gcc
 
-CFLAGS := -O2 -DRASPBERRY_PI -Wall
-CFLAGS2 := -O2 -Wall 
+CFLAGS := -O2 -DRASPBERRY_PI -Wall -std=gnu99
+CFLAGS2 := -O2 -Wall -std=gnu99
 
 AMBEserver:	GitVersion.h AMBEserver.o
-	$(GCC) $(LDFLAGS) -o AMBEserver AMBEserver.o 
+	$(GCC) $(CFLAGS) -o AMBEserver AMBEserver.o 
 	
 AMBEserver.o:	AMBEserver.c
 	$(GCC) $(CFLAGS2) -c AMBEserver.c
