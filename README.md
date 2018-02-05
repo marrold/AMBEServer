@@ -10,6 +10,8 @@ All contributions and feedback are much appreciated, as I am *not* an experience
 
 **This is a work in progress**
 
+**At least two people have had problems getting this to work, but I can see there's a steady stream of clones. If it's working for you, please let me know!**
+
 ### Building AMBEServer
 
 To build AMBESever, run-
