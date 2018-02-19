@@ -46,7 +46,7 @@ There are currently a couple of issues that I hope to resolve-
 
 Thanks to-
 
-G4KLX - AMBESever / GitVersion.h
+G4KLX - AMBESever / GitVersion.h   
 NH6Z / K7VE / DL5DI - AMBEServer  
 N80HU - Makefile inspiration  
 
