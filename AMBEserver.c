@@ -100,7 +100,7 @@ struct dv3k_packet {
 };
 #pragma pack(pop)
 
-#define DV3000_VERSION "2017-11-18"
+#define DV3000_VERSION "2018-06-13"
 #define DEFAULT_PORT 2460
 #define DEFAULT_TTY "/dev/ttyUSB0"
 #define DEFAULT_BAUD 230400
