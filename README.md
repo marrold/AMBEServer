@@ -24,7 +24,7 @@ make install
 ### Usage
 
 ```
-AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
+AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x] [-o]
 ```
 
 -d Daemon Mode  
@@ -33,7 +33,8 @@ AMBEserver [-d] [-r] [-s speed] [-p port] [-i tty] [-v] [-x]
 -p UDP port to listen on (Defaults to 2460)  
 -i tty of the AMBE Board (Defaults to dev/ttyUSB0)  
 -v Print version and exit  
--x Debug mode  
+-x Debug mode
+-o Override Product and Version ID (Adds TEAM6160 USB Voco support to Analog_Bridge etc)
 
 ### Current Issues
 
