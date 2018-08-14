@@ -105,6 +105,11 @@ struct dv3k_packet {
 #define DEFAULT_TTY "/dev/ttyUSB0"
 #define DEFAULT_BAUD 230400
 
+// B460800 is not defined on OSX
+#ifndef B460800
+#define B460800 460800
+#endif
+
 struct sockaddr_in sa = { 0 };
 static int debug = 0;
 static int override_ver = 0;
