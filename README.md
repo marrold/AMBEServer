@@ -4,7 +4,7 @@ This is my take on AMBEServer, which has been edited to add support for the DVMe
 
 It works by sending a RESETSOFTCFG packet instead of RESET, overriding the hardware configuration of the AMBE chip.
 
-Its intended to be used with [Analog_Bridge](https://github.com/N4IRS/Analog_Bridge) but may work with other processes that use AMBEServer.
+Its intended to be used with [Analog_Bridge](https://github.com/DVSwitch/Analog_Bridge) but may work with other processes that use AMBEServer.
 
 All contributions and feedback are much appreciated, as I am *not* an experienced developer...
 
